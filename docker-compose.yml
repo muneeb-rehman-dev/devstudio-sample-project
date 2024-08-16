@@ -45,6 +45,21 @@ services:
       - rabbitmq
     networks:
       - internal
+        
+  warehouse:
+    build:
+      context: .
+    image: devstudio-sample-project-warehouse
+    env_file: docker-compose.env
+    environment:
+      SERVICES: warehouse
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+      - products
+    networks:
+      - internal
 
   mongo:
     image: mongo:4

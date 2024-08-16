@@ -13,16 +13,15 @@ export interface ProductEntity {
 
 export type ActionCreateParams = Partial<ProductEntity>;
 
-export interface ActionQuantityParams {
+export interface ActionBuyParams {
 	id: string;
-	value: number;
 }
 
-interface ProductSettings extends DbServiceSettings {
+export interface ProductSettings extends DbServiceSettings {
 	indexes?: Record<string, number>[];
 }
 
-interface ProductsThis extends Service<ProductSettings>, MoleculerDbMethods {
+export interface ProductsThis extends Service<ProductSettings>, MoleculerDbMethods {
 	adapter: DbAdapter | MongoDbAdapter;
 }
 
@@ -81,45 +80,36 @@ const ProductsService: ServiceSchema<ProductSettings> & { methods: DbServiceMeth
 		 *  - remove
 		 */
 
-		// --- ADDITIONAL ACTIONS ---
-
+		// --- REQUIRED ACTIONS ---
 		/**
-		 * Increase the quantity of the product item.
+		 * Get Available Products
 		 */
-		increaseQuantity: {
-			rest: "PUT /:id/quantity/increase",
-			params: {
-				id: "string",
-				value: "number|integer|positive",
-			},
-			async handler(this: ProductsThis, ctx: Context<ActionQuantityParams>): Promise<object> {
-				const doc = await this.adapter.updateById(ctx.params.id, {
-					$inc: { quantity: ctx.params.value },
-				});
-				const json = await this.transformDocuments(ctx, ctx.params, doc);
-				await this.entityChanged("updated", json, ctx);
-
-				return json;
+		availableProducts: {
+			rest: "GET /instock",
+			async handler(this: ProductsThis): Promise<object[]> {
+				return await this.adapter.find({query: {quantity: {$gt: 0}}});
 			},
 		},
 
 		/**
-		 * Decrease the quantity of the product item.
+		 * Buy a Product
 		 */
-		decreaseQuantity: {
-			rest: "PUT /:id/quantity/decrease",
+		buyProduct: {
+			rest: "POST /:id/buy",
 			params: {
 				id: "string",
-				value: "number|integer|positive",
 			},
-			async handler(this: ProductsThis, ctx: Context<ActionQuantityParams>): Promise<object> {
-				const doc = await this.adapter.updateById(ctx.params.id, {
-					$inc: { quantity: -ctx.params.value },
-				});
-				const json = await this.transformDocuments(ctx, ctx.params, doc);
-				await this.entityChanged("updated", json, ctx);
+			async handler(this: ProductsThis, ctx: Context<ActionBuyParams>): Promise<string> {
+				const {id} = ctx.params;
+				const product: ProductEntity = <ProductEntity>await this.adapter.findById(id);
+				if (!product) {
+					throw new Error("Product not found");
+				}
 
-				return json;
+				// Decrease product count in the warehouse
+				await ctx.call("warehouse.decreaseQuantity", {id, value: 1});
+
+				return "Successfully bought " + product.name + " at price of " + product.price;
 			},
 		},
 	},
