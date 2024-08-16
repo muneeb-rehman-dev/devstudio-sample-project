@@ -1,7 +1,7 @@
 {
-  "name": "{{projectName}}",
+  "name": "devstudio-sample-project",
   "version": "1.0.0",
-  "description": "My Moleculer-based microservices project",
+  "description": "My Moleculer-based microservices sample project for Senior NodeJS Developer Position at DevStudio by Muneeb",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --config moleculer.config.ts --hot --repl services/**/*.service.ts",
@@ -9,14 +9,14 @@
     "test:types": "concurrently npm:prettier npm:lint npm:typecheck",
     "typecheck": "tsc --noEmit && echo \"tsc: no typecheck errors\"",
     "ci": "jest --watch",
-    "test": "jest --coverage"{{#lint}},
+    "test": "jest --coverage",
     "lint": "cross-env TIMING=1 eslint . --ext cjs,mjs,js,jsx,ts,tsx",
     "lint:fix": "cross-env TIMING=1 eslint . --ext cjs,mjs,js,jsx,ts,tsx --fix",
     "prettier": "prettier . --ignore-unknown --check",
-    "prettier:fix": "prettier . --ignore-unknown --write"{{/lint}}{{#docker}},
+    "prettier:fix": "prettier . --ignore-unknown --write",
     "dc:up": "docker-compose up --build -d",
     "dc:logs": "docker-compose logs -f",
-    "dc:down": "docker-compose down"{{/docker}}
+    "dc:down": "docker-compose down"
   },
   "keywords": [
     "microservices",
@@ -24,7 +24,6 @@
   ],
   "author": "",
   "devDependencies": {
-    {{#lint}}
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
     "eslint": "^8.28.0",
@@ -34,7 +33,6 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^27.1.6",
     "prettier": "^2.8.0",
-    {{/lint}}
     "@jest/globals": "^29.3.1",
     "@types/jest": "^29.2.3",
     "@types/node": "^18.11.9",
@@ -47,34 +45,11 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    {{#apiGW}}
     "moleculer-web": "^0.10.5",
-    {{/apiGW}}
-    {{#dbService}}
     "moleculer-db": "^0.8.21",
     "moleculer-db-adapter-mongo": "^0.4.16",
-    {{/dbService}}
-    {{#if_eq transporter "NATS"}}
-    "nats": "^2.7.1",
-    {{/if_eq}}
-    {{#if_eq transporter "MQTT"}}
-    "mqtt": "^4.3.7",
-    {{/if_eq}}
-    {{#if_eq transporter "AMQP"}}
     "amqplib": "^0.10.0",
-    {{/if_eq}}
-    {{#if_eq transporter "AMQP10"}}
-    "rhea-promise": "^2.1.0",
-    {{/if_eq}}
-    {{#if_eq transporter "STAN"}}
-    "node-nats-streaming": "^0.3.2",
-    {{/if_eq}}
-    {{#if_eq transporter "Kafka"}}
-    "kafka-node": "^5.0.0",
-    {{/if_eq}}
-    {{#redis}}
     "ioredis": "^5.0.0",
-    {{/redis}}
     "moleculer": "^0.14.27"
 },
   "engines": {

@@ -42,6 +42,8 @@ export default function createDbServiceMixin(collection: string): DbServiceSchem
 			},
 		},
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		async started(this: DbServiceThis) {
 			// Check the count of items in the DB. If it's empty,
 			// call the `seedDB` method of the service.
